@@ -10,10 +10,13 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        $user = $this->record;
+        if (isset($data['roles'])) {
+            $user->syncRoles($data['roles']); // Sync roles with Spatie
+            unset($data['roles']); // Remove roles from direct database save
+        }
+        return $data;
     }
 }
